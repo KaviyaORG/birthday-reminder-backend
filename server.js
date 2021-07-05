@@ -15,6 +15,8 @@ const SignInRouter =require('./Router/signInRouter');
 const forgotPasswordGetRouter =require('./Router/getPasswordRouter');
 const updatePasswordRouter =require('./Router/updatePassword');
 
+const PORT = process.env.PORT || 8000;
+
 require("dotenv").config({
     path:'./config/config.env'
 });
@@ -47,4 +49,4 @@ app.use('/updatePassword',updatePasswordRouter);
 app.use('/signUp',SignUpRouter);
 app.use('/signIn',SignInRouter);
 
-app.listen(8000,console.log("Birthday reminder server running..."))
+app.listen(PORT,console.log("Birthday reminder server running..."))
