@@ -2,7 +2,7 @@ const express =require('express');
 const router =express.Router();
 const path =require("path");
 const multer=require('multer');
-const Controllers = require('../Controllers(data_list)/controllers');
+const Controllers = require('../Controllers/controllers');
 
 
 const storage =multer.diskStorage({

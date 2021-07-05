@@ -7,13 +7,13 @@ const mongoose =require('mongoose');
 const session = require('express-session');
 const MongoDbSession = require('connect-mongodb-session')(session);
 
-const addBirthdayRouter =require('./Router(data_list)/addBirthdayRouter');
-const userDataDeleteRouter =require('./Router(data_list)/userDataDeleteRouter');
-const homePageloadDataRouter =require('./Router(data_list)/homePageloadDataRouter');
-const SignUpRouter =require('./Router(data_list)/signUprouter');
-const SignInRouter =require('./Router(data_list)/signInRouter');
-const forgotPasswordGetRouter =require('./Router(data_list)/getPasswordRouter');
-const updatePasswordRouter =require('./Router(data_list)/updatePassword');
+const addBirthdayRouter =require('./Router/addBirthdayRouter');
+const userDataDeleteRouter =require('./Router/userDataDeleteRouter');
+const homePageloadDataRouter =require('./Router/homePageloadDataRouter');
+const SignUpRouter =require('./Router/signUprouter');
+const SignInRouter =require('./Router/signInRouter');
+const forgotPasswordGetRouter =require('./Router/getPasswordRouter');
+const updatePasswordRouter =require('./Router/updatePassword');
 
 require("dotenv").config({
     path:'./config/config.env'
