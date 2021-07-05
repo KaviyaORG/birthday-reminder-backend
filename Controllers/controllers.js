@@ -383,6 +383,7 @@ exports.getPassword =(req,res)=>{
             })
         }
         const userPassword =user.password
+        const userEmail =user.email
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -394,8 +395,8 @@ exports.getPassword =(req,res)=>{
 
         const mailOptions = {
             from: 'anonymous99kavi99@gmail.com',
-            // to: "kavinda.harsha@gmail.com",
-            to: "ganewatthakavishka@gmail.com",
+            to: `${userEmail}`,
+            // to: "ganewatthakavishka@gmail.com",
             subject: 'Birthday reminder account password',
             html: `
 <!--                    <h1>Your password is:- <span style="color:#00ff0d">${userPassword}</span></h1><br>-->
@@ -468,7 +469,7 @@ exports.updatePassword=(req,res)=>{
 
         const mailOptions = {
             from: 'anonymous99kavi99@gmail.com',
-            to: "ganewatthakavishka@gmail.com",
+            to:`${email}`,
             subject: 'Birthday reminder account password',
             html: `<h1>Your new password is:- <span style="color:#00ff0d">${password}</span></h1><br>`
         }
