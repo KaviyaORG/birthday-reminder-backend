@@ -15,13 +15,6 @@ exports.postAlldata =(req,res)=>{
     const url = req.protocol + '://'+ req.get("host");
     const {email} =req.body
 
-    let { name,date} =req.body
-
-
-    // console.log("email:"+email)
-    // console.log("name:"+name)
-    // console.log("birthday:"+date)
-
     User.find({email:email})
         .exec((err,user)=>{
             if (user[0]){
@@ -75,7 +68,6 @@ exports.postAlldata =(req,res)=>{
 }
 exports.getAlldata=(req,res)=>{
 
-    // console.log("got access")
     try{
         User.find({email:req.data.user.email})
             .then((results) => {
@@ -268,6 +260,7 @@ exports.getPassword =(req,res)=>{
             })
         }
         const userEmail =user.email
+        const userAccessToken =jwt.sign(User,process.env.JWT_SECRET);
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -282,7 +275,7 @@ exports.getPassword =(req,res)=>{
             to: `${userEmail}`,
             subject: 'Birthday reminder account password',
             html: `
-                    <h2 >Link:-<a style="color:#7d0512" href="${process.env.frontend_URl}/updatePassword">click here for change password</h2>
+                    <h2 >Link:-<a style="color:#7d0512" href="${process.env.frontend_URl}/updatePassword/${userAccessToken}"">click here for change password</h2>
 `
         };
 
@@ -292,7 +285,7 @@ exports.getPassword =(req,res)=>{
             }
 
             const User ={ user:user};
-            const accessToken =jwt.sign(User,process.env.JWT_SECRET);
+            const accessToken =jwt.sign(User,process.env.JWT_RESET_SECRET);
 
 
                 return res.status(200).json({
@@ -308,7 +301,7 @@ exports.getPassword =(req,res)=>{
 }
 exports.updatePassword=(req,res)=>{
 
-    let {email ,password} =req.body
+    let {email ,password,token} =req.body
         console.log(email)
         console.log(password)
 
@@ -340,25 +333,29 @@ exports.updatePassword=(req,res)=>{
             subject: 'Birthday reminder account password',
             html: `<h1>Your new password is:- <span style="color:#00ff0d">${password}</span></h1><br>`
         }
+    jwt.verify(token,process.env.JWT_SECRET,function (err,decoded) {
+        if (err){
+            return res.status(400).json("you are not right user ")
+        }
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    return res.status(400).send("email doesnt send,try again !!!!")
+                } else {
+                    return res.status(200).send(" new password send to your email")
+                }
+            });
 
-        transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-                return res.status(400).send("email doesnt send,try again !!!!")
-            } else {
-                return res.status(200).send(" new password send to your email")
-            }
-        });
 
 
+            const salt = 10;
+            bcrypt.hash(password, salt, (err, encrypted) => {
 
-    const salt = 10;
-    bcrypt.hash(password, salt, (err, encrypted) => {
+                Account.findOneAndUpdate(filter, {password:encrypted} , {new: true}, function(err, doc) {
+                    if (err) return res.status(400).send(err);
+                    return res.status(200).send('Successfully saved.(check your email)');
+                })
 
-        Account.findOneAndUpdate(filter, {password:encrypted} , {new: true}, function(err, doc) {
-            if (err) return res.status(400).send(err);
-            return res.status(200).send('Successfully saved.(check your email)');
-        })
-
+            })
     })
 
 

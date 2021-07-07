@@ -18,7 +18,6 @@ const Upload =multer({
 
 router.post('/',Upload.single('image'),Controllers.validationOfImage,Controllers.postAlldata)
       .get('/',Controllers.verify,Controllers.getAlldata)
-// router.get('/',Controllers.verify,Controllers.getAlldata)
 
 module.exports = router
 
