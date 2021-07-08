@@ -337,25 +337,29 @@ exports.updatePassword=(req,res)=>{
         if (err){
             return res.status(400).json("you are not right user ")
         }
-            transporter.sendMail(mailOptions, function(error, info){
-                if (error) {
-                    return res.status(400).send("email doesnt send,try again !!!!")
-                } else {
-                    return res.status(200).send(" new password send to your email")
-                }
-            });
+        if(decoded.user.email !== email ){
+            return res.status(400).send("email doesnt match !!!!")
+        }
+
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                return res.status(400).send("email doesnt send,try again !!!!")
+            } else {
+                return res.status(200).send(" new password send to your email")
+            }
+        });
 
 
 
-            const salt = 10;
-            bcrypt.hash(password, salt, (err, encrypted) => {
+        const salt = 10;
+        bcrypt.hash(password, salt, (err, encrypted) => {
 
-                Account.findOneAndUpdate(filter, {password:encrypted} , {new: true}, function(err, doc) {
-                    if (err) return res.status(400).send(err);
-                    return res.status(200).send('Successfully saved.(check your email)');
-                })
-
+            Account.findOneAndUpdate(filter, {password:encrypted} , {new: true}, function(err, doc) {
+                if (err) return res.status(400).send(err);
+                return res.status(200).send('Successfully saved.(check your email)');
             })
+
+        })
     })
 
 
