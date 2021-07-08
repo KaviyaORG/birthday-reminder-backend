@@ -7,6 +7,9 @@ const mongoose =require('mongoose');
 const session = require('express-session');
 const MongoDbSession = require('connect-mongodb-session')(session);
 
+const PORT = process.env.PORT || 3000;
+
+
 const addBirthdayRouter =require('./Router/addBirthdayRouter');
 const userDataDeleteRouter =require('./Router/userDataDeleteRouter');
 const homePageloadDataRouter =require('./Router/homePageloadDataRouter');
@@ -47,4 +50,4 @@ app.use('/updatePassword',updatePasswordRouter);
 app.use('/signUp',SignUpRouter);
 app.use('/signIn',SignInRouter);
 
-app.listen(8000,console.log("Birthday reminder server running..."))
+app.listen(PORT,console.log("Birthday reminder server running..."))
