@@ -267,7 +267,7 @@ exports.getPassword =(req,res)=>{
             to:`${userEmail}`,
             subject: 'Birthday reminder account password',
             html: `
-                    <h2 >Link:-<a style="color:#7d0512" href="http://localhost:3000/updatePassword/${userAccessToken}">click here for change password</h2>
+                    <h2 >Link:-<a style="color:#7d0512" href="${process.env.frontend_URl}/updatePassword/${userAccessToken}">click here for change password</h2>
 `
         };
 
