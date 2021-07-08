@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const User =require('../Model(data_list)/UserModel');
-const Account =require('../Model(data_list)/signUpModel');
+const User =require('../Model/UserModel');
+const Account =require('../Model/signUpModel');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 
