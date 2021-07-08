@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const User =require('../Model/UserModel');
-const Account =require('../Model/signUpModel');
+const User =require('../Model(data_list)/UserModel');
+const Account =require('../Model(data_list)/signUpModel');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 
@@ -10,15 +10,23 @@ const { promisify } = require('util')
 const unlinkAsync = promisify(fs.unlink)
 
 
+
+
 exports.postAlldata =(req,res)=>{
+
 
     const url = req.protocol + '://'+ req.get("host");
     const {email} =req.body
 
+    // let { name,date} =req.body
+    // let {filename,path} =req.file
+    // console.log("email:"+email)
+    // console.log("name:"+name)
+    // console.log("birthday:"+date)
+
     User.find({email:email})
         .exec((err,user)=>{
             if (user[0]){
-
                         const birthdayArray = user[0].userBirthdays;
     
                         birthdayArray.push({
@@ -27,17 +35,14 @@ exports.postAlldata =(req,res)=>{
                             imageName: req.file.path,
                             image: url + "/uploads/" + req.file.filename,
                         })
-
                         user[0].markModified('userBirthdays')
                         user[0].save()
                             .then((r) => {
                                 res.status(200).send("Data saving successfully")
-
                             })
                             .catch((err) => {
                                 res.status(500).send("Data isn't saving")
                             })
-
                 }
 
                 if (!user[0]) {
@@ -61,17 +66,16 @@ exports.postAlldata =(req,res)=>{
                             res.status(500).send("Data isn't saving")
 
                         })
-
                 }
         })
 
 }
 exports.getAlldata=(req,res)=>{
-
+    console.log("got access")
+    const {email} =req.data.user.email
     try{
         User.find({email:req.data.user.email})
             .then((results) => {
-
                 res.json({results:results[0].userBirthdays})
             })
     }
@@ -91,7 +95,6 @@ exports.deleteUserData =(req,res)=>{
 
     const id =req.params.id;
     const email =req.query.user;
-
 
     User.findOneAndUpdate(
         { email : `${email}` },
@@ -131,7 +134,6 @@ exports.getAllDataHome =(req,res)=>{
                     const birthdayMonth = parseInt((birth_date[5] + birth_date[6]))
                     const birthdayYear = parseInt((birth_date[0] + birth_date[1] + birth_date[2] + birth_date[3]))
 
-
                     const getYear = currentDate.getFullYear() - birthdayYear;
                     const getDate1 = (birthdayDate - currentDate.getDate()) < 2;
                     const getDate2 = (birthdayDate - currentDate.getDate()) >= 0;
@@ -139,10 +141,8 @@ exports.getAllDataHome =(req,res)=>{
 
                     if (getMonth && getDate1 && getDate2) {
                         reminderBdList.push({'id': `${id}`, 'name': `${name}`, 'image': `${image}`,'years':`${getYear} years old`});
-
                     }
                 }
-
             });
             return res.send(reminderBdList)
         }
@@ -152,15 +152,9 @@ exports.createAccount = (req,res)=>{
 
     let { username,email,password} =req.body
 
-    console.log(username)
-    console.log(email)
-    console.log(password)
-
-
     if ( username === '' || email === '' || password === null){
         return res.status(500).send("Please fill all field")
     }
-    //
     const checkUserName = /^[a-z0-9]+$/.exec(username)
     const checkEmail =/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.exec(email)
 
@@ -221,8 +215,6 @@ exports.LoginController =(req,res)=>{
         Account.findOne({
             email
         }).exec((err,user)=>{
-            // console.log(user)
-
             if (err|| !user){
                 return res.status(400).send("email does not exist,please Sign Up")
             }
@@ -233,13 +225,11 @@ exports.LoginController =(req,res)=>{
                 bcrypt.compare(password, user.password, function (err, result) {
                     if (result === true) {
                         return res.json({ accessToken:accessToken})
-
                     } else {
                         return res.status(400).send("Incorrect password !")
                     }
                 })
             }
-
         })
 }
 exports.getPassword =(req,res)=>{
@@ -260,7 +250,9 @@ exports.getPassword =(req,res)=>{
             })
         }
         const userEmail =user.email
+        const User ={ user:user};
         const userAccessToken =jwt.sign(User,process.env.JWT_SECRET);
+
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -272,12 +264,13 @@ exports.getPassword =(req,res)=>{
 
         const mailOptions = {
             from: `${process.env.my_email}`,
-            to: `${userEmail}`,
+            to:`${userEmail}`,
             subject: 'Birthday reminder account password',
             html: `
-                    <h2 >Link:-<a style="color:#7d0512" href="${process.env.frontend_URl}/updatePassword/${userAccessToken}"">click here for change password</h2>
+                    <h2 >Link:-<a style="color:#7d0512" href="http://localhost:3000/updatePassword/${userAccessToken}">click here for change password</h2>
 `
         };
+
 
         transporter.sendMail(mailOptions, function(error, info){
             if (error) {
@@ -287,7 +280,6 @@ exports.getPassword =(req,res)=>{
             const User ={ user:user};
             const accessToken =jwt.sign(User,process.env.JWT_RESET_SECRET);
 
-
                 return res.status(200).json({
                     message:"Check your email for change password",
                     accessToken:accessToken
@@ -295,16 +287,11 @@ exports.getPassword =(req,res)=>{
                 })
 
         });
-
-
     })
 }
 exports.updatePassword=(req,res)=>{
 
     let {email ,password,token} =req.body
-        console.log(email)
-        console.log(password)
-
 
     if (email === '' || password === ''){
         return res.status(500).send("Please fill all field")
@@ -316,27 +303,29 @@ exports.updatePassword=(req,res)=>{
         return res.status(500).send("Email is incorrect format try again !!!")
     }
 
+
     const filter = {'email': email};
 
-
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: `${process.env.my_email}`,
-                pass: `${process.env.my_password}`
-            }
-        });
-
-        const mailOptions = {
-            from: `${process.env.my_email}`,
-            to:`${email}`,
-            subject: 'Birthday reminder account password',
-            html: `<h1>Your new password is:- <span style="color:#00ff0d">${password}</span></h1><br>`
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: `${process.env.my_email}`,
+            pass: `${process.env.my_password}`
         }
-    jwt.verify(token,process.env.JWT_SECRET,function (err,decoded) {
+    });
+
+    const mailOptions = {
+        from: `${process.env.my_email}`,
+        to:`${email}`,
+        subject: 'Birthday reminder account password',
+        html: `<h1>Your new password is:- <span style="color:#00ff0d">${password}</span></h1><br>`
+    }
+
+jwt.verify(token,process.env.JWT_SECRET,function (err,decoded) {
         if (err){
             return res.status(400).json("you are not right user ")
         }
+
         if(decoded.user.email !== email ){
             return res.status(400).send("email doesnt match !!!!")
         }
@@ -345,11 +334,9 @@ exports.updatePassword=(req,res)=>{
             if (error) {
                 return res.status(400).send("email doesnt send,try again !!!!")
             } else {
-                return res.status(200).send(" new password send to your email")
+                return res.status(200).send("new password send to your email")
             }
         });
-
-
 
         const salt = 10;
         bcrypt.hash(password, salt, (err, encrypted) => {
@@ -360,8 +347,7 @@ exports.updatePassword=(req,res)=>{
             })
 
         })
-    })
-
+})
 
 }
 exports.verify=(req,res,next)=>{
@@ -370,9 +356,7 @@ exports.verify=(req,res,next)=>{
 
     if(token == null) return  res.sendStatus(401)
     jwt.verify(JSON.parse(token), process.env.JWT_SECRET,(err,data)=>{
-        // if(err) return res.sendStatus(403)
-        if(err) return console.log(err)
-
+        if(err) return res.sendStatus(403)
         req.data=data
         next();
     })
@@ -383,3 +367,4 @@ exports.validationOfImage=(req,res,next)=>{
     }
     next()
 }
+
